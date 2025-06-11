@@ -1,0 +1,24 @@
+.custom-swiper-button {
+
+	.swiper-button-prev,
+	.swiper-button-next {
+		background: #FFFFFF;
+		border-radius: 0.25rem;
+		height: 5rem;
+		width: 2.25rem;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
+
+		&:after {
+			font-size: 0.75rem;
+			color: #333333;
+		}
+
+		@media only screen and (max-width: 767px) {
+			display: none;
+		}
+	}
+
+	.swiper-pagination-bullet-active {
+		background-color: #000;
+	}
+}
