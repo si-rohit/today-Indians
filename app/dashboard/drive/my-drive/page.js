@@ -26,6 +26,12 @@ const Page = () => {
 
   const { user } = useSelector(store => store.auth);
 
+  useEffect(() => {
+    if (!user) {
+      router.push('/auth');
+    }
+  });
+
   const [view, setView] = useState("grid");
   const [showDropdown, setShowDropdown] = useState('');
   const [fetchData, setFetchData] = useState([]);
@@ -113,6 +119,7 @@ const Page = () => {
         body: JSON.stringify({ itemId: id, type: type }) 
       });
       const data = await resp.json();
+      console.log(data);
       if(data.error){
         alert(data.error);
         return;
@@ -227,7 +234,7 @@ const Page = () => {
                             {/* <button className="w-full px-4 py-2 text-gray-800 hover:bg-gray-100 text-start flex items-center gap-2" onClick={() => alert('copy')}><LuCopy />Copy</button> */}
                             {/* <button className="w-full px-4 py-2 text-gray-800 hover:bg-gray-100 text-start flex items-center gap-2" onClick={() => alert('move')}><TbCut />Cut</button> */}
                             {/* <button className="w-full px-4 py-2 text-gray-800 hover:bg-gray-100 text-start flex items-center gap-2" onClick={() => setRenameItem(folder._id)}><BiRename /> Rename</button> */}
-                            <button className="w-full px-4 py-2 text-gray-800 hover:bg-gray-100 text-start flex items-center gap-2" onClick={() => handleDeleteFolder(file._id,'folder')}><MdDeleteOutline />Delete</button>
+                            <button className="w-full px-4 py-2 text-gray-800 hover:bg-gray-100 text-start flex items-center gap-2" onClick={() => handleDeleteFolder(file._id,'file')}><MdDeleteOutline />Delete</button>
                           </div>
                         )
                       }
@@ -239,6 +246,8 @@ const Page = () => {
             ))
           }
         </div>
+
+        {fetchData?.folders?.length === 0 && fetchData?.files?.length === 0 && <p className="text-center text-gray-500">No files or folders found</p>}
         
       </div>
     </div>

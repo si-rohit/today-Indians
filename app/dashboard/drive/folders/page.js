@@ -121,9 +121,7 @@ const FolderManager = () => {
    <div className="w-full relative">
    
          {/* Filters + View Toggle */}
-         <div className="flex justify-end gap-4 items-center mb-4 relative">
-           
-          
+         <div className="flex justify-end gap-4 items-center mb-4 relative">          
            {/* View toggle and info */}
            <div className="flex items-center gap-2">
              <button onClick={() => setView("list")} className={`p-2 rounded-full hover:bg-gray-200 ${view === 'list' ? 'bg-gray-100' : ''}`}>

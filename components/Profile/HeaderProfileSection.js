@@ -8,7 +8,7 @@ import { PiSignOut, PiArticleMediumThin,PiSignIn  } from "react-icons/pi";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from '@/app/redux/authSlice';
+import { setUser, setUserFolders } from '@/app/redux/authSlice';
 import userIcon2 from '@/public/images/userIcon.png'
 import { RxCross2 } from "react-icons/rx";
 
@@ -20,6 +20,17 @@ export const HeaderProfileSection = () => {
     const { user } = useSelector(store => store.auth)
     const { userFolders } = useSelector(store => store.auth)
     // console.log(userFolders);
+    const [isDarkMode, setIsDarkMode] = useState(true);
+    
+        useEffect(() => {
+            const Theam = localStorage.getItem('theam');
+            if (Theam === 'dark') {
+                setIsDarkMode(true);
+            }
+            else {
+                setIsDarkMode(false);
+            }
+        }, []);
 
     const dispatch = useDispatch();
 
@@ -32,6 +43,11 @@ export const HeaderProfileSection = () => {
     const handleLogout = () => {
         console.log('logout');
         dispatch(setUser(null));
+        dispatch(setUserFolders(null));
+        localStorage.removeItem('token');
+        localStorage.removeItem('theam');
+        localStorage.removeItem('email');
+        localStorage.removeItem('uid');
         router.push('/auth');
     }
 
@@ -64,49 +80,49 @@ export const HeaderProfileSection = () => {
                 />
 
                 {showUserMenu && (
-                    <div className="absolute left-1/2 transform -translate-x-1/2 z-50 top-12 bg-gray-100 border border-gray-200 w-full text-black min-w-48 ">
-                        <div className='bg-[#fdac42] absolute -top-2 rotate-45 left-1/2 transform -translate-x-1/2 w-5 h-5 max-[426px]:hidden'></div>
+                    <div className={`absolute left-1/2 transform -translate-x-1/2 z-50 top-12 border w-full  ${isDarkMode ? 'bg-[#333] border-gray-600 text-white' : 'bg-gray-100 border-gray-200 text-black'} min-w-48`}>
+                        <div className={`${isDarkMode ? 'bg-[#333]':'bg-[#ffffff] '} absolute -top-2 rotate-45 left-1/2 transform -translate-x-1/2 w-5 h-5 max-[426px]:hidden`}></div>
                         <ul className="flex flex-col">
-                            <li className="flex items-center gap-1 text-sm px-2 py-2 relative border-b bg-[#fdac42] border-gray-200">
+                            <li className={`flex items-center gap-3 text-sm px-2 py-2 relative border-b ${isDarkMode ? 'bg-[#333] border-gray-600 text-white' : 'bg-gray-100 border-gray-200 text-black'}`}>
                                 <Image src={user?.image || userIcon2} className="bg-gray-200 rounded-full p-1" height={42} width={42} alt="User" />
                                 <p className="text-[14px] font-semibold flex flex-col">
                                     {username2}
-                                    <span className="text-xs text-gray-700">{user?.username ? user?.username : user?.user_id} </span>
+                                    <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-700 '}`}>{user?.username ? user?.username : user?.user_id} </span>
                                 </p>    
-                                <span className='text-[20px] cursor-pointer absolute right-4' onClick={() => setShowUserMenu(false)}><RxCross2 /></span>                           
+                                {/* <span className='text-[20px] cursor-pointer absolute right-4' onClick={() => setShowUserMenu(false)}><RxCross2 /></span>                            */}
                             </li>
                             <li>
-                                <Link href="/dashboard" className="flex items-center gap-1 text-sm px-2 py-2 hover:bg-gray-200 border-b border-gray-200">
+                                <Link href="/dashboard" className={`flex items-center gap-1 text-sm px-2 py-2 border-b ${isDarkMode ? 'hover:bg-[#222] border-gray-600':'border-gray-200 hover:bg-gray-200'}`}>
                                     <LuLayoutDashboard className="text-lg" /> Dashboard
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/profile" className="flex items-center gap-1 text-sm px-2 py-2 hover:bg-gray-200 border-b border-gray-200">
+                                <Link href="/profile" className={`flex items-center gap-1 text-sm px-2 py-2 border-b ${isDarkMode ? 'hover:bg-[#222] border-gray-600':'border-gray-200 hover:bg-gray-200'}`}>
                                     <CiUser className="text-lg" /> Profile
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/article" className="flex items-center gap-1 text-sm px-2 py-2 hover:bg-gray-200 border-b border-gray-200">
+                                <Link href="/article" className={`flex items-center gap-1 text-sm px-2 py-2 border-b ${isDarkMode ? 'hover:bg-[#222] border-gray-600':'border-gray-200 hover:bg-gray-200'}`}>
                                     <PiArticleMediumThin className="text-lg" /> Articles
                                 </Link>
                             </li>
                             <li >
-                                <Link href="/dashboard/wallet" className="flex items-center gap-1 text-sm px-2 py-2 hover:bg-gray-200 border-b border-gray-200 cursor-pointer">
+                                <Link href="/dashboard/wallet" className={`flex items-center gap-1 text-sm px-2 py-2 border-b ${isDarkMode ?'hover:bg-[#222] border-gray-600':' hover:bg-gray-200 border-gray-200 '} cursor-pointer`}>
                                     <CiWallet className="text-lg" /> Wallet
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/dashboard/settings" className="flex items-center gap-1 text-sm px-2 py-2 hover:bg-gray-200 border-b border-gray-200 cursor-pointer">
+                                <Link href="/dashboard/settings" className={`flex items-center gap-1 text-sm px-2 py-2 border-b ${isDarkMode ?'hover:bg-[#222] border-gray-600':' hover:bg-gray-200 border-gray-200 '} cursor-pointer`}>
                                     <CiSettings className="text-lg" /> Settings
                                 </Link>
                             </li>
                             {
                                 user === null ?(
-                                  <Link href="/auth" className="flex items-center gap-1 text-sm px-2 py-2 hover:bg-gray-200 text-red-600 cursor-pointer">
+                                  <Link href="/auth" className={`flex items-center gap-1 text-sm px-2 py-2 ${isDarkMode ? "hover:bg-[#222]":'hover:bg-gray-200'} text-red-600 cursor-pointer`}>
                                     <PiSignIn className="text-lg text-black" /> Login
                                 </Link>  
                                 ): (
-                                    <li className="flex items-center gap-1 text-sm px-2 py-2 hover:bg-gray-200 text-red-600 cursor-pointer" onClick={()=>handleLogout()}>
+                                    <li className={`flex items-center gap-1 text-sm px-2 py-2 ${isDarkMode ? "hover:bg-[#222]":'hover:bg-gray-200'} text-red-600 cursor-pointer`} onClick={()=>handleLogout()}>
                                         <PiSignOut  className="text-lg text-black" /> Signout
                                     </li>
                                 )

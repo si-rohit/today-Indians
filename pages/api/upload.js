@@ -31,11 +31,11 @@ export default function handler(req, res) {
                 const {fileUploadingPath} = req.body;
                 // console.log("file =", JSON.stringify(file, null, 2));
                 if (!file) {
-                    return res.status(400).json({ response: "error", message: "no file uploaded" });
+                    return res.status(400).json({ message: "no file uploaded",file:'' });
                     
                 }
                 if (!fileUploadingPath) {
-                    return res.status(400).json({ response: "error", message: "no file uploading path" });
+                    return res.status(400).json({ message: "no file uploading path",file:'' });
                     
                 }
                 const fileContent = fs.readFileSync(file.path);
@@ -49,13 +49,20 @@ export default function handler(req, res) {
                         Bucket: process.env.AWS_BUCKET_NAME,
                         Key: `${fileUploadingPath}/${fileName}`,
                     }).promise();
+
+                     const existingFileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileUploadingPath}/${fileName}`;
+
                     fs.unlinkSync(file.path);
-                    return res.status(409).json({ response: "error", message: "file already exists" });
+                    return res.status(200).json({
+                        response: "ok",
+                        file: existingFileUrl,
+                        // message: "file already exists"
+                    });
 
                 } catch (err) {
                     if (err.code !== "NotFound") {
                         fs.unlinkSync(file.path);
-                        return res.status(500).json({ response: "error", message: "failed to check file existence" });
+                        return res.status(500).json({ response: "error", message: "failed to check file existence",file:'' });
                     }
                 }
 
@@ -70,7 +77,7 @@ export default function handler(req, res) {
                 const { Location } = await s3.upload(params).promise();
                 fs.unlinkSync(file.path);
 
-                console.log('✅ Upload Direct - 1 REQUEST COMPLETED');
+                // console.log('✅ Upload Direct - 1 REQUEST COMPLETED');
 
                 res.status(200).json({
                     response: "ok",
@@ -85,6 +92,6 @@ export default function handler(req, res) {
             }
         });
     } else {
-        res.status(405).json({ response: "error", message: 'method' });
+        res.status(405).json({ response: "error", message: 'method',file:'' });
     }
 }

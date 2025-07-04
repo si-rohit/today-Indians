@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
-import logoWhite from "@/public/images/logoWhite.png"
+import logoWhite from "@/public/images/The-Today-Indians-Logo-Pack/Main-White@4x.png";
 import Image from 'next/image';
 import { IoGlobeOutline } from "react-icons/io5";
 import { FaCaretDown } from "react-icons/fa";

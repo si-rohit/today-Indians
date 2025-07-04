@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
   --background: #ffffff;
@@ -23,7 +23,7 @@
 body {
   background: var(--foreground);
   color: var(--background);
-  font-family: "Roboto", sans-serif;
+  font-family: "Bricolage Grotesque", sans-serif;
 }
 
 .LogoFont{
@@ -43,7 +43,7 @@ body {
 
 /* From Uiverse.io by bociKond */ 
 /* From Uiverse.io by Lmickk2 */ 
-.loader {
+/* .loader {
   display: flex;
   transition: all 0.4s;
 }
@@ -76,7 +76,35 @@ body {
     background-color: rgb(99, 98, 98);
     box-shadow: none;
   }
+} */
+
+.loader {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: block;
+  margin:7px auto;
+  position: relative;
+  color: #ffffffb7;
+  box-sizing: border-box;
+  animation: animloader 0.5s linear infinite alternate;
 }
+
+@keyframes animloader {
+  0% {
+    box-shadow: -38px -12px ,  -14px 0,  14px 0, 38px 0;
+  }
+  33% {
+    box-shadow: -38px 0px, -14px -12px,  14px 0, 38px 0;
+  }
+  66% {
+    box-shadow: -38px 0px , -14px 0, 14px -12px, 38px 0;
+  }
+  100% {
+    box-shadow: -38px 0 , -14px 0, 14px 0 , 38px -12px;
+  }
+}
+
 
 .swiper {
   width: 100%;
@@ -102,3 +130,18 @@ body {
   height: 100%;
   object-fit: cover;
 } */
+
+
+.Input{
+  width: 100%;
+  padding: 4px 16px;
+  border: 1px solid #ccc;
+  outline-color: black;
+  background-color: white;
+}
+.Button{
+  width: 100%;
+  padding: 6px 16px;
+  color: white;
+  background-color: #222;
+}

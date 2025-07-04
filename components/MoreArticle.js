@@ -1,5 +1,5 @@
 'use client';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from 'react';
 
 import Image1 from '@/public/images/Thumbnail/hq720(1).jpg'
@@ -59,6 +59,17 @@ const dummyArticles = [
   ];
 export const MoreArticle = () => {
     const [visibleCount, setVisibleCount] = useState(3);
+    const [isDarkMode, setIsDarkMode] = useState(true);
+    
+    useEffect(() => {
+        const Theam = localStorage.getItem('theam');
+        if (Theam === 'dark') {
+            setIsDarkMode(true);
+        }
+        else {
+            setIsDarkMode(false);
+        }
+    }, []);
 
     const showMore = () => {
       setVisibleCount((prev) => prev + 3);
@@ -71,10 +82,10 @@ export const MoreArticle = () => {
 
       <div className="grid md:grid-cols-3 gap-6">
         {dummyArticles.slice(0, visibleCount).map((article, idx) => (
-          <div key={idx} className="bg-white p-4">
+          <div key={idx} className={` p-4 ${isDarkMode ? 'text-white bg-[#333]' : 'text-black bg-white'}`}>
             <Image src={article.image} alt={article.title} className=" mb-3" />
             <h2 className="text-xl font-semibold">{article.title}</h2>
-            <p className="text-gray-700 mt-2">{article.content}</p>
+            <p className={` mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>{article.content}</p>
           </div>
         ))}
       </div>

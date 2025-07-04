@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
   let path = null;
   if (id) {
-    const folder = await Folder.findById(id);
+    const folder = await Folder.findById({ _id: id });
     if (!folder) {
       return res.status(404).json({ error: "Folder not found" });
     }

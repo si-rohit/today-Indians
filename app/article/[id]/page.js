@@ -6,42 +6,71 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
+import Duplicate from './Duplicate';
+import MostPopular from '@/components/HeroPageComponents/MostPopular';
+import SubHeader from '@/components/Header/SubHeader';
+import DuplicateSkeleton from '@/components/DuplicateSkeleton';
 
 const Page = () => {
   const { id } = useParams();
   // console.log(id);
   const { user } = useSelector(store => store.auth);
   const [post, setPost] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
     
     useEffect(() => {
+        const Theam = localStorage.getItem('theam');
+        if (Theam === 'dark') {
+            setIsDarkMode(true);
+        }
+        else {
+            setIsDarkMode(false);
+        }
+    }, []);
+    
+    useEffect(() => {
+      setLoading(true);
       const fetchData = async () => {
       try {
-        const response = await fetch(`https://5341.general.pointer.8080-server.net/post?poid=${id}`, {
+        const response = await fetch(`https://5341.general.pointer.8080-server.net/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': '1',
           },
-          body: JSON.stringify({ user: user.user_id }),
+          body: JSON.stringify({ user: user ? user.user_id : ''}),
         })
         const data = await response.json();
         // console.log(data);
         setPost(data);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
       fetchData();
-    }, [id, user.user_id]);
+    }, [id, user]);
 
-    // console.log(post);
+    console.log(post);
 
   return (
-    <div>
-      <Header />
-      {/* <div className='w-full bg-gray-100 mx-auto min-h-[300px] flex justify-center p-10'>
-      </div> */}
-        <div className='w-2/4 max-[769px]:w-3/4 max-[426px]:w-full mx-auto'>
+    <div className={`${isDarkMode ? 'text-white bg-[#12110f]' : 'text-black bg-white'} `}>
+      {/* <Header /> */}
+      <SubHeader />
+      <div className=" bg-[#f8b841] text-black overflow-hidden flex items-center mt-25">
+        <div className='bg-red-500 text-white px-2 font-bold'>
+          Breaking
+        </div>
+        <marquee className="bg-[#f8b841] text-black h-full flex items-center justify-start " onMouseEnter={(e)=>e.target.setAttribute("scrollamount",0)} onMouseLeave={(e)=>e.target.setAttribute("scrollamount",6)}>
+          {[...Array(30).keys()].map((i) => (
+            <span key={i} className="px-5 hover:underline cursor-pointer ">
+              This website is currently in beta phase. Some features may not work as expected.
+            </span>
+          ))}
+        </marquee>
+      </div>
+        <div className='hidden w-2/4 max-[769px]:w-3/4 max-[426px]:w-full mx-auto'>
           <h1 className='text-[40px] font-bold max-[426px]:px-3 max-[426px]:text-[30px]'>
             {post.title}
           </h1>
@@ -75,10 +104,8 @@ const Page = () => {
             <blockquote className="border-l-4 border-blue-500 pl-4 italic text-gray-600 mb-4">
               “Rather than fixing the rules, Trump has chosen to blow up the system.”
             </blockquote>
-
-            <p className="mb-4">Read the full article on{' '}
-              <Link href="https://example.com" className="text-blue-600 underline">our website</Link
-              >.
+           <p className="mb-4">Read the full article on 
+              <Link href="https://example.com" className="text-blue-600 underline">our website</Link>.
             </p>
 
             <p className="mb-4"><strong>Note:</strong> New rules will take effect <small>this Saturday</small>.</p>
@@ -117,7 +144,7 @@ const Page = () => {
             <p className="mb-4">Basic Calculation Example:</p>
             <pre className="bg-gray-100 p-4 rounded mb-4 text-sm">
               <code>
-      {`let baseTariff = 10;\nlet chinaExtra = 34;\nlet finalTariff = baseTariff + chinaExtra;\nconsole.log(finalTariff);`}
+                {`let baseTariff = 10;\nlet chinaExtra = 34;\nlet finalTariff = baseTariff + chinaExtra;\nconsole.log(finalTariff);`}
               </code>
             </pre>
 
@@ -159,6 +186,7 @@ const Page = () => {
               <sup>*</sup> Refer to the official White House document<sub>1</sub>.
             </p>
           </div>
+
           <p className='text-gray-700 mt-4 text-[17px] max-[426px]:px-3'>
             Reporting was contributed by Joe Rennison, Colby Smith and Lazaro Gamio from New York and Alan Rappeport and Shawn McCreesh from Washington. Tung Ngo contributed research.
             <br /> <br />
@@ -172,6 +200,15 @@ const Page = () => {
           <button className='text-white bg-[#144a69] w-full rounded py-2 font-bold'>READ 449 COMMENTS</button>
 
         </div>
+        <div className='flex container mx-auto gap-4 '>
+          <div className='min-w-[74%] '>
+            {loading ? <DuplicateSkeleton /> : <Duplicate post={post} />}
+          </div>
+          <div className='mt-4'>
+            <MostPopular />
+          </div>
+        </div>
+        
         <div>
           <MoreArticle />
         </div>

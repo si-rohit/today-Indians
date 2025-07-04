@@ -44,6 +44,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "please Select the folder" });
   }
 
+  // console.log(itemId,type)
+
   try {
     if (type === "folder") {
       await deleteFolderRecursive(itemId);

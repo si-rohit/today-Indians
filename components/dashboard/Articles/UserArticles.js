@@ -21,6 +21,17 @@ const UserArticles = () => {
   const [showComments, setShowComments] = useState('');
   const { user } = useSelector(store => store.auth);
   const [userCreatedArticles, setUserCreatedArticles] = useState([]);
+   const [isDarkMode, setIsDarkMode] = useState(true);
+      
+    useEffect(() => {
+      const Theam = localStorage.getItem('theam');
+      if (Theam === 'dark') {          
+        setIsDarkMode(true);
+      }
+      else {          
+        setIsDarkMode(false);
+      }
+    }, []);
      
     
     useEffect(() => {
@@ -75,8 +86,8 @@ const UserArticles = () => {
   
   return (
     <div className="">
-      <table className="min-w-full table-auto text-sm text-left bg-white rounded-md shadow">
-        <thead className="bg-gray-300 text-[#222] ">
+      <table className={`min-w-full table-auto text-sm text-left  ${isDarkMode ? 'text-white' : 'bg-white'} rounded-md shadow`}>
+        <thead className={` ${isDarkMode ? 'bg-[#222] text-white' : 'bg-gray-300 text-[#222]'}`}>
           <tr>
             <th className="p-3 text-sm">Post</th>
             <th className="p-3 text-sm">Visibility</th>
@@ -89,7 +100,7 @@ const UserArticles = () => {
         </thead>
         <tbody>
           {userCreatedArticles?.map((item, idx) => (
-            <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50 group/item cursor-pointer">
+            <tr key={idx} className={`border-b  ${ isDarkMode ? ' border-gray-600 hover:bg-[#111]' : 'border-gray-200 hover:bg-gray-50'} group/item cursor-pointer`}>
               <td className="p-3 flex max-[769px]:flex-col items-center gap-3" onClick={()=>handleUpdateArticle(item.post_id)}>
                 <Image
                   src={ item.image?.trimStart() || noImage}
@@ -99,8 +110,8 @@ const UserArticles = () => {
                   className=" object-cover"
                 />
                 <div className='relative' ref={menuRef}>
-                  <p className="font-semibold max-[769px]:hidden text-gray-800 ">{item.title}</p>
-                  <p className="hidden text-gray-800 max-[769px]:flex">{item.title.split(' ').slice(0, 4).join(' ')}...</p>
+                  <p className="font-semibold max-[769px]:hidden ">{item.title}</p>
+                  <p className="hidden max-[769px]:flex">{item.title.split(' ').slice(0, 4).join(' ')}...</p>
                   <p className="text-xs text-gray-500 max-[769px]:hidden group-hover/item:hidden">{item.sub_descr}</p>
                   <div className='group-hover/item:flex mt-2 gap-4 text-xl hidden'>
                     <FiEdit3 className='hover:text-gray-600'/>

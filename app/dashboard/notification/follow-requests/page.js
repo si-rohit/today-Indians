@@ -1,6 +1,6 @@
 'use client'
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaAngleLeft } from "react-icons/fa";
 
 const followRequests = [
@@ -47,8 +47,19 @@ const suggestions = [
 ];
 
 const Page = () => {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+    
+        useEffect(() => {
+            const Theam = localStorage.getItem('theam');
+            if (Theam === 'dark') {          
+                setIsDarkMode(true);
+            }
+            else {          
+                setIsDarkMode(false);
+            }
+        }, []);
   return (
-    <div className="px-3 max-w-[70%] min-h-screen">
+    <div className={`px-3 max-w-[70%] min-h-screen ${isDarkMode ? "text-white" : ""}`}>
       <div className="flex items-center mb-5 text-2xl font-semibold gap-2">
         <FaAngleLeft onClick={() => window.history.back()} cursor={"pointer"}/>
         <h2 className="">Follow requests</h2>

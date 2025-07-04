@@ -9,40 +9,7 @@ import userIcon from '@/public/images/User_icon_2.svg.png'
 import { useParams } from 'next/navigation'
 import noImage from '@/public/images/noImage.jpeg'
 
-// const newsList = [
-//     {
-//       source: 'Ashish Chaudhary',
-//       logo: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D', // place in public folder
-//       title: 'Indian Engineers Federation meets union ministers C R Patil, Nitin Gadkari',
-//       desc: 'A delegation of the Indian Engineers\' Federation (INDEF) has held discussions with union ministers C R Patil and...',
-//       time: '3 days ago',
-//       image: Image1,
-//     },
-//     {
-//       source: 'Subham Saha',
-//       logo: '',
-//       title: 'Union Minister Nitin Gadkari Inaugurates “Ivana by Jindal” Flagship Jewellery Store in Nagpur',
-//       desc: 'Surat-based premium jewellery brand Ivana by Jindal launched its third...',
-//       time: '6 hours ago',
-//       image: Image2,
-//     },
-//     {
-//       source: 'Amit Kumar',
-//       logo: '', // place in public folder
-//       title: 'Indian Engineers Federation meets union ministers C R Patil, Nitin Gadkari',
-//       desc: 'A delegation of the Indian Engineers\' Federation (INDEF) has held discussions with union ministers C R Patil and...',
-//       time: '3 days ago',
-//       image: Image3, // example placeholder
-//     },
-//     {
-//       source: 'Amarjeet Singh',
-//       logo: '',
-//       title: 'Union Minister Nitin Gadkari Inaugurates “Ivana by Jindal” Flagship Jewellery Store in Nagpur',
-//       desc: 'Surat-based premium jewellery brand Ivana by Jindal launched its third...',
-//       time: '6 hours ago',
-//       image: Image5,
-//     },
-// ]
+
 const Page = () => {
   const { qurey } = useParams();
   const [newsList, setNewsList] = useState([]);

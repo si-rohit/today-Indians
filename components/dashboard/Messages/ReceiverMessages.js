@@ -136,8 +136,19 @@ const ReceiverMessages = () => {
   const [isOpenArchive, setIsOpenArchive ] = useState(false);
   const [updatedUsers, setUpdatedUsers] = useState(tempUsers);
   const [isOpenUserProfile, setIsOpenUserProfile] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+    
+  useEffect(() => {
+    const Theam = localStorage.getItem('theam');
+    if (Theam === 'dark') {          
+      setIsDarkMode(true);
+    }
+    else {          
+      setIsDarkMode(false);
+    }
+  }, []);
 
-  console.log(inputFiles);
+  // console.log(inputFiles);
 
   const sendMessage = () => {
     // if (!newMessage.trim()) return;
@@ -238,14 +249,14 @@ const ReceiverMessages = () => {
   return (
     <div className="flex min-h-[88vh] overflow-hidden">
       {/* Sidebar */}
-      <div className="w-2/5 bg-gray-100 pr-4 max-[769px]:p-2 overflow-y-auto">
+      <div className={`w-2/5  ${isDarkMode ? 'bg-[#3330] text-white' : 'bg-gray-100'} pr-4 max-[769px]:p-2 overflow-y-auto`}>
         <h2 className="text-2xl font-semibold mb-1 flex items-center gap-4">{isOpenArchive ? <FaChevronLeft onClick={() => setIsOpenArchive(false)}/> : ''}{isOpenArchive ? 'Archive' : 'Messages'}</h2>
         <hr className="mb-4 border-t border-gray-300" />
 
         <div className={`${isOpenArchive ? 'hidden' : ''}`}>
           {updatedUsers.filter((user) => user.archive).length > 0 && (
             <button
-              className=" hover:bg-gray-200 text-black w-full py-2 px-4 flex items-center gap-2"
+              className={`  ${isDarkMode ? 'hover:bg-[#444]' : 'hover:bg-gray-200'}  w-full py-2 px-4 flex items-center gap-2`}
               onClick={() => setIsOpenArchive(true)}
             >
              <MdOutlineArchive/> Archive
@@ -260,8 +271,8 @@ const ReceiverMessages = () => {
                 key={index}
                 >
                   <div           
-                    className={`relative flex items-center ${index === 0 ? 'border-none' : 'border-t border-gray-300 '} justify-between gap-3 p-3 max-[769px]:p-1 cursor-pointer hover:bg-gray-200 ${
-                      selectedUser.id === user.id ? "bg-white shadow" : ""
+                    className={`relative flex items-center ${index === 0 ? 'border-none' : `border-t  ${isDarkMode ? 'border-gray-600':'border-gray-300'} `} justify-between gap-3 p-3 max-[769px]:p-1 cursor-pointer ${isDarkMode ? "hover:bg-[#444]" : "hover:bg-gray-200"}${
+                      selectedUser.id === user.id ? ` shadow ${isDarkMode ? "text-white bg-[#333]" : "bg-white"}` : ""
                     }`}
                     onClick={() => setSelectedUser(user)}
                     
@@ -290,7 +301,7 @@ const ReceiverMessages = () => {
                     </div>
                     
                     {openSidebarChatMenu === user.id && (
-                      <div className="absolute top-9 right-0 mt-2 mr-2 bg-white shadow z-10">
+                      <div className={`absolute top-9 right-0 mt-2 mr-2 ${isDarkMode ? 'bg-[#333]' : 'bg-white '} shadow z-10 `}>
                         <ul>
                           <li onClick={()=>setIsOpenUserProfile(true)} className="px-2 pr-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"><FaRegUser />View Profile</li>
                           <li onClick={() => handlePin(user.id)} className="px-2 pr-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2">{user.pin ? <div className="flex items-center gap-2"><PinOff className="text-xl w-4.5"/>Unpin</div> : <div className="flex items-center gap-2"><Pin className="text-xl w-4.5" />Pin</div>}</li>
@@ -312,8 +323,8 @@ const ReceiverMessages = () => {
                 key={user.id}
                 >
                   <div           
-                    className={`relative ${index === 0 ? 'border-none' : 'border-t border-gray-300 '} flex items-center justify-between gap-3 p-3 max-[769px]:p-1 cursor-pointer hover:bg-gray-200 ${
-                      selectedUser.id === user.id ? "bg-white shadow" : ""
+                    className={`relative ${index === 0 ? 'border-none' : `border-t  ${isDarkMode ? 'border-gray-600':'border-gray-300'} `} flex items-center justify-between gap-3 p-3 max-[769px]:p-1 cursor-pointer  ${isDarkMode ? "hover:bg-[#444]" : "hover:bg-gray-200"} ${
+                      selectedUser.id === user.id ? ` shadow ${isDarkMode ? "text-white bg-[#333]" : "bg-white"}` : ""
                     }`}
                     onClick={() => setSelectedUser(user)}
                     
@@ -328,7 +339,7 @@ const ReceiverMessages = () => {
                       />
                       <div>
                         <p className="font-medium text-sm flex items-center gap-2">{user.name} {user.verified && <FaCheckCircle className="text-blue-500"/>}</p>
-                        <p className="text-xs text-gray-500 truncate max-w-[150px]">
+                        <p className={`text-xs  ${isDarkMode ? "text-gray-400" : "text-gray-500"} truncate max-w-[150px]`}>
                           {user.block ? "You blocked this contact" : `${user.lastMessage}`}               
                         </p>
                       </div>
@@ -342,7 +353,7 @@ const ReceiverMessages = () => {
                     </div>
                     
                     {openSidebarChatMenu === user.id && (
-                      <div className="absolute top-9 right-0 mt-2 mr-2 bg-white shadow z-10">
+                      <div className={`absolute top-9 right-0 mt-2 mr-2 ${isDarkMode ? "bg-[#222]" : "bg-white"} shadow z-10`}>
                         <ul>
                           <li onClick={()=>setIsOpenUserProfile(true)} className="px-2 pr-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"><FaRegUser />View Profile</li>
                           <li onClick={() => handlePin(user.id)} className="px-2 pr-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2">{user.pin ? <div className="flex items-center gap-2"><PinOff className="text-xl w-4.5"/>Unpin</div> : <div className="flex items-center gap-2"><Pin className="text-xl w-4.5" />Pin</div>}</li>
@@ -364,7 +375,7 @@ const ReceiverMessages = () => {
 
       {/* Chat Window */}
 
-      <div className="relative w-full p-4 max-[425px]:p-0 flex flex-col justify-between bg-white">
+      <div className={`relative w-full p-4 max-[425px]:p-0 flex flex-col justify-between ${isDarkMode ? "bg-[#222]" : "bg-white"}`}>
         
         {isOpenUserProfile ? (
           <UserProfile selectedUser={selectedUser} close={handleCloseProfile}/>

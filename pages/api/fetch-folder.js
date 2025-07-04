@@ -11,6 +11,10 @@ export default async function handler(req, res) {
 
   const { folderId ,folderName } = req.body;
 
+  if (!folderId && !folderName) {
+    return res.status(400).json({ error: 'Missing folderId or folderName' });
+  }
+  // console.log(folderId,folderName);
   try {
     // Fetch folders with matching parentId (or root)
 
@@ -25,6 +29,7 @@ export default async function handler(req, res) {
 
 
     // Fetch files inside this folder
+    // console.log(folderId || parentId);
     const files = await File.find({ folderId: folderId || parentId }).lean();
 
     res.status(200).json({

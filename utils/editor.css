@@ -1,0 +1,9 @@
+.ProseMirror {
+  outline: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  /* height: '400px'; */
+  min-height: '400px';
+}

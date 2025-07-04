@@ -1,5 +1,6 @@
+'use client'
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaAngleRight } from "react-icons/fa";
 import image from "@/public/images/Thumbnail/hq720.jpg";
 import Link from "next/link";
@@ -76,8 +77,19 @@ const notifications = {
 };
 
 const Page = () => {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  
+      useEffect(() => {
+          const Theam = localStorage.getItem('theam');
+          if (Theam === 'dark') {          
+              setIsDarkMode(true);
+          }
+          else {          
+              setIsDarkMode(false);
+          }
+      }, []);
   return (
-    <div className="min-h-screen px-3 max-w-[70%]">
+    <div className={`min-h-screen px-3 max-w-[70%] ${isDarkMode ? "text-white" : ""}`}>
       <h2 className="text-2xl font-bold mb-4">Notifications</h2>
 
       {/* Follow Requests */}
@@ -104,7 +116,7 @@ const Page = () => {
       )}
 
       {/* This Month */}
-      <p className="border-t border-gray-300 text-sm text-gray-600 mt-2 pt-2 mb-2">This month</p>
+      <p className={`border-t border-gray-300 text-sm  ${isDarkMode ? "text-white" : "text-gray-600"} mt-2 pt-2 mb-2`}>This month</p>
       {notifications.thisMonth.map((n) => (
         <div key={n.id} className="flex items-center justify-between py-2">
           <div className="flex gap-3 items-center">
@@ -127,7 +139,7 @@ const Page = () => {
       ))}
 
       {/* Earlier */}
-      <p className="text-sm text-gray-600 mt-2 pt-2 border-t border-gray-300 mb-2">Earlier</p>
+      <p className={`text-sm  mt-2 pt-2 border-t border-gray-300 ${isDarkMode ? "text-white" : "text-gray-600"} mb-2`}>Earlier</p>
       {notifications.earlier.map((n) => (
         <div key={n.id} className="flex items-center justify-between py-2">
           <div className="flex gap-3 items-center">

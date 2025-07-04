@@ -2,7 +2,7 @@
 import React from 'react'
 
 const FetchDataAPI = ({folderId = '',onData,folderName}) => { 
-    // console.log("folderid",folderId);
+    // console.log("folderid",folderName);
     fetch('/api/fetch-folder', {
         method: 'POST',
         headers: {

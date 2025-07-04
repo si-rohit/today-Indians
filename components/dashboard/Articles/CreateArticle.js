@@ -5,6 +5,12 @@ import { AlignLeft,AlignCenter ,AlignRight,ChevronDown,List,ListOrdered,Bold,Und
 import { useSelector } from 'react-redux';
 import { FaMapPin } from "react-icons/fa6";
 import Image from 'next/image';
+import Cropper from 'react-easy-crop';
+import { getCroppedImg } from '@/utils/cropImage'
+import TiptapEditor from '@/utils/TiptapEditor';
+import { IoMdAdd } from "react-icons/io";
+import { MdOutlineDeleteForever } from "react-icons/md";
+
 
 const CreateArticle = () => {
   const searchParams = useSearchParams();
@@ -13,6 +19,27 @@ const CreateArticle = () => {
   const editorRef = useRef(null);
   const { user } = useSelector(store => store.auth);
   const [post, setPost] = useState({});
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  // for image cropping
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState(null);
+
+  // for markdown
+
+     
+    useEffect(() => {
+      const Theam = localStorage.getItem('theam');
+      if (Theam === 'dark') {          
+        setIsDarkMode(true);
+      }
+      else {          
+        setIsDarkMode(false);
+      }
+    }, []);
 
   // fetch the post data
   
@@ -28,7 +55,7 @@ const CreateArticle = () => {
           body: JSON.stringify({ user: user.user_id }),
         })
         const data = await response.json();
-        // console.log(data);
+        console.log(data);
         setPost(data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -100,7 +127,6 @@ const CreateArticle = () => {
   const [categorySuggestions, setCategorySuggestions] = useState([]);
   const [TagsSuggestions, setTagsSuggestions] = useState([]);
   const [showAditionalFields, setShowAdditionalFields] = useState(false);
-  const [thumbnailFile, setThumbnailFile] = useState(null);
 
   const PrivateUsers = ['user1', 'user2', 'user3', 'user4', 'user5',];
   const categorySuggestionsFiltered = categorySuggestions.filter((suggestion) => suggestion.name.toLowerCase().includes(formData.categoryInput));
@@ -149,42 +175,16 @@ const CreateArticle = () => {
   const handleThumbnailUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData((prev) => ({
-        ...prev,
-        thumbnailPreview: URL.createObjectURL(file),
-      }));
-      setThumbnailFile(file);
+      const url = URL.createObjectURL(file);
+      setUploadedImage(url);
+      setShowCropper(true); // open cropping modal
     }
   };
 
-  // console.log(formData.discription);
-  const farmData = new FormData();
-  // farmData.append('channel_id', 42);
-  farmData.append('uid', user.user_id);
-  farmData.append('title', formData.title);
-  farmData.append('sub_descr', formData.sub_description);
-  farmData.append('description', formData.discription);
-  farmData.append('image', formData.thumbnail);
-  farmData.append('hashtags', formData.tags);
-  // farmData.append('visibility', formData.visibility);
-  if(!id){
-    farmData.append('permalink', formData.permalink);
-  }
-  farmData.append('published', formData.Publish_Date);
-  farmData.append('meta_title', formData.metaTitle);
-  farmData.append('meta_description', formData.metaDescription);
-  farmData.append('meta_keywords', formData.metaKeywords);
-  farmData.append('status', formData.status);
-  farmData.append('type', 'post');
-  farmData.append("project_link", formData.project_link);
-  farmData.append("location", formData.location);
-  farmData.append("download_link", formData.download_link);
-  formData.category.forEach(element => {
-    farmData.append('topic_id[]', element);
-  });
-
-  const updateArticle = async () => {
-      console.log(formData);
+  const updateArticle = async (farmData) => {
+      // for (let [key, value] of farmData.entries()) {
+      //   console.log(`${key}: ${value}`);
+      // }
       const response = await fetch(`https://5341.general.pointer.8080-server.net/up_post?id=${id}&channel=42`, {
         method: 'POST',
         headers: {
@@ -198,14 +198,16 @@ const CreateArticle = () => {
     console.log(data);
     if (data.response === "ok") {
       alert("Article update successfully");      
+      formData.thumbnail='';
+      // thumbnailUploadedImg='';
     }else{
       alert("Something went wrong");
     }
     }
-  const CreateArticle = async () => {
+  const CreateArticle = async (farmData) => {
     setLoading(true);
     if (!formData.title || formData.title.trim() === '' || formData.sub_description.trim() === '' || formData.discription.trim() === '') {
-      alert("Please enter a title.");
+      alert(`Please enter a ${formData.title.trim() === '' ? 'title' :''} and ${formData.sub_description.trim() === '' ? 'sub description' : 'discription'}`);
       setLoading(false);
       return;
     }
@@ -219,7 +221,7 @@ const CreateArticle = () => {
     })
     const data = await response.json();
     setLoading(false);
-    console.log(data);
+    // console.log(data);
     if (data.response === "ok") {
       alert("Article created successfully");
       setFormData({
@@ -240,38 +242,75 @@ const CreateArticle = () => {
     }
   }
   const handleUpload = async () => {
-    const formData = new FormData();
-    formData.append('file', thumbnailFile);
-    formData.append('fileUploadingPath', 'uploads');
-    // console.log(thumbnailFile);
+    const thumbnailData = new FormData();
+    // thumbnailData.append('file', thumbnailFile);
+    thumbnailData.append('file', formData.thumbnail);
+    thumbnailData.append('fileUploadingPath', `users/${user.user_id}/thumbnails`);
 
     const res = await fetch('/api/upload', {
       method: 'POST',
-      body: formData,
+      body: thumbnailData,
     });
 
     const data = await res.json();
-    console.log(data);
-    setFormData((prev) => ({
-      ...prev,
-      thumbnail: data.file,
-    }));
+    // console.log(data);
+    if (data.response === "error") {
+      alert("Something went wrong");
+      setLoading(false);
+      return
+    }
+    const uploadedThumbnail = data.file !== ''
+    ? data.file
+    : formData.thumbnailPreview;
+
+    const farmData = new FormData();
+    // farmData.append('channel_id', 42);
+    farmData.append('uid', user.user_id);
+    farmData.append('title', formData.title);
+    farmData.append('sub_descr', formData.sub_description);
+    farmData.append('description', formData.discription);
+    farmData.append('image', uploadedThumbnail);
+    farmData.append('hashtags', formData.tags);
+    farmData.append('public', formData.visibility === 'public' ? '1' : '2');
+    farmData.append('type', 'article');
+    if(!id){
+      farmData.append('permalink', formData.permalink);
+    }
+    farmData.append('published', formData.Publish_Date);
+    farmData.append('meta_title', formData.metaTitle);
+    farmData.append('meta_description', formData.metaDescription);
+    farmData.append('meta_keywords', formData.metaKeywords);
+    farmData.append('status', formData.status);
+    farmData.append('type', 'post');
+    farmData.append("project_link", formData.project_link);
+    farmData.append("location", formData.location);
+    farmData.append("download_link", formData.download_link);
+    if (Array.isArray(formData.category)) {
+      formData.category.forEach(element => {
+        farmData.append('topic_id[]', element);
+      });
+    }
+
+    // for (let [key, value] of farmData.entries()) {
+    //     console.log(`${key}: ${value}`);
+    //   }
+    if (id) {
+      updateArticle(farmData);     
+    }
+    else{
+      CreateArticle(farmData);
+    }
+
   };
   const handleSubmit = async(e) => {
     e.preventDefault();
     setLoading(true);
-    await handleUpload();
-    if (id) {
-      updateArticle();     
-    }
-    else{
-      CreateArticle();
-    }
+    await handleUpload();  
   };
   
 
   return (
-    <div className="relative bg-[#f9f9f9]">
+    <div className={`relative  ${isDarkMode ? 'text-white' : 'bg-[#f9f9f9]'}`}>
       <h1 className='text-3xl font-bold ml-3 mb-3'>{id ? 'Update Article' : 'Create Article'}</h1>
       <div className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto px-4" >
         {/* Main Editor Area */}
@@ -282,7 +321,7 @@ const CreateArticle = () => {
             placeholder="Title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full text-lg border border-gray-300 px-2 py-1 bg-white focus:outline-none"
+            className={`w-full text-lg border px-2 py-1 focus:outline-none ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'}`}
           />
           <input
             type="text"
@@ -293,7 +332,7 @@ const CreateArticle = () => {
               const value = e.target.value.replace(/[^a-zA-Z0-9-_]/g, '');
               handleChange({ target: { name: e.target.name, value } });
             }}
-            className="w-full text-lg border border-gray-300 px-2 bg-white py-1 focus:outline-none"
+            className={`w-full text-lg border px-2 ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} py-1 focus:outline-none`}
           />
 
           <input
@@ -302,39 +341,28 @@ const CreateArticle = () => {
             placeholder="Sub Description"
             value={formData.sub_description}
             onChange={handleChange}
-            className="w-full text-lg border border-gray-300 bg-white px-2 py-1 focus:outline-none"
+            className={`w-full text-lg border px-2 py-1 focus:outline-none ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'}`}
           />
 
-          {/* <div className="border border-gray-300 ">
-            <div className="flex flex-wrap items-center gap-4 px-3 py-2 bg-gray-200 text-gray-700">
-              <button onClick={() => handleFormat('bold')} className="font-bold hover:text-black cursor-pointer"><Bold  /></button>
-              <button onClick={() => handleFormat('italic')} className="italic hover:text-black cursor-pointer"><Italic  /></button>
-              <button onClick={() => handleFormat('underline')} className="underline hover:text-black cursor-pointer"><Underline  /></button>
-              <button onClick={() => handleFormat('insertUnorderedList')} className='hover:text-black cursor-pointer'><List  /></button>
-              <button onClick={() => handleFormat('insertOrderedList')} className='hover:text-black cursor-pointer'><ListOrdered  /></button>
-              <button onClick={() => handleFormat('justifyLeft')} className='hover:text-black cursor-pointer'><AlignLeft /></button>
-              <button onClick={() => handleFormat('justifyCenter')} className='hover:text-black cursor-pointer'><AlignCenter  /></button>
-              <button onClick={() => handleFormat('justifyRight')} className='hover:text-black cursor-pointer'><AlignRight /></button>
-              <button onClick={() => handleFormat('formatBlock', '<blockquote>')} className='hover:text-black cursor-pointer'>❝ ❞</button>
-              <button onClick={() => handleFormat('removeFormat')} className='hover:text-black cursor-pointer'>✖</button>
-            </div>
-            <div
-              ref={editorRef}
-              contentEditable
-              className="min-h-[300px] p-4 outline-none leading-relaxed text-gray-800"
-              placeholder="Write your article "
-              suppressContentEditableWarning={true}
-            ></div>
-          </div> */}
-          <textarea
+          
+          {/* <textarea
             type="text"
             name="discription"
             placeholder="Description "
             value={formData.discription}
             onChange={handleChange}
             rows={8}
-            className="w-full text-lg border bg-white border-gray-300 px-2 py-1 focus:outline-none"
-          />
+            className={`w-full text-lg border  px-2 py-1 focus:outline-none ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'}`}
+          /> */}
+          <div className="mt-4">
+            <label className="block font-semibold mb-1">Description</label>
+            <TiptapEditor
+              value={formData.discription}
+              onChange={(html) =>
+                setFormData((prev) => ({ ...prev, discription: html }))
+              }
+            />
+          </div>
 
           <h1 className='text-2xl font-bold '>
             SEO Details
@@ -345,7 +373,7 @@ const CreateArticle = () => {
             placeholder="Meta Title "
             value={formData.metaTitle}
             onChange={handleChange}
-            className="w-full text-lg border bg-white border-gray-300 px-2 py-1  focus:outline-none"
+            className={`w-full text-lg border ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} px-2 py-1  focus:outline-none`}
           />
           <input
             type="text"
@@ -356,7 +384,7 @@ const CreateArticle = () => {
               const value = e.target.value.replace(/[^a-zA-Z0-9-_]/g, '');
               handleChange({ target: { name: e.target.name, value } });
             }}
-            className="w-full text-lg border border-gray-300 px-2 bg-white py-1 focus:outline-none"
+            className={`w-full text-lg border px-2 ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} py-1 focus:outline-none`}
           />
           <textarea
             type="text"
@@ -364,7 +392,7 @@ const CreateArticle = () => {
             placeholder="Meta Description "
             value={formData.metaDescription}
             onChange={handleChange}
-            className="w-full text-lg border bg-white border-gray-300 px-2 py-1 focus:outline-none"
+            className={`w-full text-lg border  ${isDarkMode ? 'bg-[#333] border-gray-600':'bg-white border-gray-300'} px-2 py-1 focus:outline-none`}
           />
           <textarea
             type="text"
@@ -372,7 +400,7 @@ const CreateArticle = () => {
             placeholder="Meta Keywords "
             value={formData.metaKeywords}
             onChange={handleChange}
-            className="w-full text-lg border bg-white border-gray-300 px-2 py-1 focus:outline-none"
+            className={`w-full text-lg border  ${isDarkMode ? 'bg-[#333] border-gray-600':'bg-white border-gray-300'} px-2 py-1 focus:outline-none`}
           />
 
           <h1 className='text-2xl font-bold flex justify-between items-center cursor-pointer' onClick={() => setShowAdditionalFields(!showAditionalFields)}>
@@ -387,7 +415,7 @@ const CreateArticle = () => {
                   placeholder="Project Link "
                   value={formData.project_link}
                   onChange={handleChange}
-                  className="w-full text-lg border bg-white border-gray-300 px-2 py-1  focus:outline-none"
+                  className={`w-full text-lg border ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} px-2 py-1  focus:outline-none`}
                 />
                 <input
                   type="text"
@@ -395,7 +423,7 @@ const CreateArticle = () => {
                   placeholder="Download Link "
                   value={formData.download_link}
                   onChange={handleChange}
-                  className="w-full text-lg border border-gray-300 px-2 bg-white py-1 focus:outline-none"
+                  className={`w-full text-lg border px-2 ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} py-1 focus:outline-none`}
                 />
                     </div>
                   )
@@ -404,10 +432,9 @@ const CreateArticle = () => {
 
         {/* Sidebar */}
         <div className="w-full lg:w-1/3 space-y-6">
-                {/* Thumbnail Preview */}
             
           {/*publish */}
-            <div className="border border-gray-300 flex flex-col gap-1.5 bg-white p-4">
+            <div className={`border flex flex-col gap-1.5 ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} p-4`}>
               <h3 className="font-semibold mb-2">Publish</h3>
               <div className='flex '>
                 <p className='flex items-center'><Eye className='mr-1 w-4.5'/>Visibility:</p>
@@ -415,11 +442,11 @@ const CreateArticle = () => {
                   name="visibility"
                   value={formData.visibility}
                   onChange={handleChange}
-                  className="focus:outline-none focus:ring-none text-gray-700"
+                  className={`focus:outline-none focus:ring-none ${isDarkMode ? 'text-gray-400':'text-gray-700'}`}
                   required
               >
-                  <option defaultValue="public">Public 1</option>
-                  <option value="private">Private 2</option>
+                  <option defaultValue="public">Public</option>
+                  <option value="private">Private</option>
               </select>
               </div>
               <div className='flex '>
@@ -429,7 +456,7 @@ const CreateArticle = () => {
                   name="Publish_Date"
                   value={formData.Publish_Date || ''}
                   onChange={handleChange}
-                  className="focus:outline-none focus:ring-none text-gray-700"
+                  className={`focus:outline-none focus:ring-none ${isDarkMode ? 'text-gray-400':'text-gray-700'}`}
                   ></input>
                 {/* <p>{formData.Publish_Date}</p> */}
               </div>
@@ -440,7 +467,7 @@ const CreateArticle = () => {
                     onClick={(e) =>{formData.status=0; handleSubmit(e)}}
                     className=" py-1 bg-gray-200 text-black hover:bg-gray-300 group/button w-full"
                   >
-                    <div className='flex items-center justify-center py-1 border border-gray-200 group-hover/button:border-[#111]'>
+                    <div className='flex items-center justify-center py-1 border border-gray-200 group-hover/button:border-gray-300'>
                       <div>Draft </div>
                     </div>
                 </button>
@@ -464,7 +491,7 @@ const CreateArticle = () => {
 
           {/* select users */}
           {formData.visibility === "private" &&
-          <div className="border border-gray-300  bg-white p-4" 
+          <div className={`border ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} p-4`} 
           onBlur={() => setTimeout(() => setShowPrivateSuggestions(false), 500)}
           >
             <h3 className="font-semibold mb-2">Select Users </h3>
@@ -476,10 +503,10 @@ const CreateArticle = () => {
             onChange={handleChange}
             
             onClick={() => setShowPrivateSuggestions(true)}
-            className="w-full border border-gray-300 p-2 "
+            className={`w-full border focus:outline-none p-2 ${isDarkMode ? 'border-gray-600':'border-gray-300'}`}
           />
           {showPrivateSuggestions &&
-          <div className='flex flex-col w-full bg-white'>         
+          <div className={`flex flex-col w-full ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} p-4}`}>         
               {PrivateUsers.map((suggestion, index) => (
                 <button
                   key={index}
@@ -491,7 +518,7 @@ const CreateArticle = () => {
                     setShowPrivateSuggestions(false)
                   }  
                   }
-                  className="text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 cursor-pointer px-2 min-w-full text-start py-1"
+                  className={`text-sm  ${isDarkMode ?' text-gray-400':'text-gray-600'} hover:text-gray-800 hover:bg-gray-100 cursor-pointer px-2 min-w-full text-start py-1`}
                 >
                   {suggestion}
                 </button>
@@ -501,24 +528,24 @@ const CreateArticle = () => {
           </div>}
 
           {/* Thumbnail Upload */}
-          <div className="border border-gray-300 bg-white p-4">
+          <div className={`border ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} p-4`}>
             <h3 className="font-semibold mb-2">Thumbnail</h3>
             {formData.thumbnailPreview && (
                 <div className="mb-3 relative">
                   <Image
                     src={formData.thumbnailPreview  ? formData.thumbnailPreview.trimStart() : ""}
                     alt="Thumbnail Preview"
-                    className="w-full h-full max-h-30"
-                    width={100}
-                    height={100}
+                    className="w-full h-full max-h-40"
+                    width={400}
+                    height={160}
                   />
-                  <span onClick={() => setFormData((prev) => ({ ...prev, thumbnailPreview: "" }))} className="text-red-500 cursor-pointer absolute top-1 right-1"><CircleX /></span>
+                  <span onClick={() => setFormData((prev) => ({ ...prev, thumbnailPreview: "" }))} className="text-white bg-[#0000008c] cursor-pointer absolute top-1 text-2xl right-1"><MdOutlineDeleteForever /></span>
                 </div>
               )}
             <input type="file" accept="image/*" id='thumbnail' className='hidden' onChange={handleThumbnailUpload} />
             <div className='flex justify-between gap-4'>
-              <label htmlFor="thumbnail" className="cursor-pointer w-full bg-gray-200 p-2">{formData.thumbnailPreview !== "" ? "Change Image" : "Upload Image"}</label>
-              <p onClick={()=>setShowThumbnailLinkInput(!showThumbnailLinkInput)} className='p-2 cursor-pointer w-full bg-gray-200 text-center'>Image Link</p>
+              <label htmlFor="thumbnail" className={`cursor-pointer w-full  p-2 ${formData.thumbnailPreview ? 'hidden':''} ${isDarkMode ? 'bg-[#111]':'bg-gray-200'} `}>{formData.thumbnailPreview !== "" ? "Change Image" : "Upload Image"}</label>
+              <p onClick={()=>setShowThumbnailLinkInput(!showThumbnailLinkInput)} className={`p-2 cursor-pointer w-full ${formData.thumbnailPreview ? 'hidden':''} ${isDarkMode ? 'bg-[#111]':'bg-gray-200'} text-center`}>Image Link</p>
             </div>
 
             {showThumbnailLinkInput && (
@@ -527,9 +554,9 @@ const CreateArticle = () => {
                     type="text"
                     name="thumbnail"
                     placeholder="Image Link"
-                    value={formData.thumbnail}
-                    onChange={handleChange}
-                    className="w-full text-lg border bg-white border-gray-300 px-2 py-1 focus:outline-none"
+                    value={formData.thumbnailPreview}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, thumbnailPreview: e.target.value }))}
+                    className={`w-full text-lg border ${formData.thumbnailPreview ? 'hidden':''} ${isDarkMode ? 'bg-[#333] border-gray-600':'bg-white border-gray-300'} px-2 py-1 focus:outline-none`}
                   />
                 </div>
               )}
@@ -537,7 +564,7 @@ const CreateArticle = () => {
           </div>         
 
           {/* Category */}
-          <div className="border border-gray-300  bg-white p-4" onBlur={() => setTimeout(() => setShowCategorySuggestions(false), 500)}>
+          <div className={`border ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} p-4`} onBlur={() => setTimeout(() => setShowCategorySuggestions(false), 500)}>
             <h3 className="font-semibold mb-2">Category</h3>
             <div className="flex flex-wrap gap-2 mb-2">
               {formData.category.map((tag, index) => (
@@ -585,10 +612,10 @@ const CreateArticle = () => {
                 }
               }
             }}
-            className="w-full border border-gray-300 p-2 "
+            className={`w-full focus:outline-none border p-2 ${isDarkMode ? 'border-gray-600':'border-gray-300'}`}
             />
             {showCategorySuggestions &&
-            <div className='flex flex-col w-full bg-white'>         
+            <div className={`flex flex-col w-full${isDarkMode ? 'bg-[#111]':'bg-white'}`}>         
                 {categorySuggestionsFiltered.map((suggestion, index) => (
                   <button
                     key={index}
@@ -600,7 +627,7 @@ const CreateArticle = () => {
                       setShowCategorySuggestions(false)
                     }  
                     }
-                    className="text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 cursor-pointer px-2 min-w-full text-start py-1"
+                    className={`text-sm  ${isDarkMode ?' text-gray-400':'text-gray-600'} hover:text-gray-800 hover:bg-gray-100 cursor-pointer px-2 min-w-full text-start py-1`}
                   >
                     {suggestion.name}
                   </button>
@@ -610,7 +637,7 @@ const CreateArticle = () => {
           </div>
 
           {/* Tags */}
-          <div className="border border-gray-300  bg-white p-4" onBlur={() => setTimeout(() => setShowTagSuggestions(false), 500)}>
+          <div className={`border ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} p-4`} onBlur={() => setTimeout(() => setShowTagSuggestions(false), 500)}>
             <h3 className="font-semibold mb-2">Tags</h3>
             <div className="flex flex-wrap gap-2 mb-2">
               {formData.tags.map((tag, index) => (
@@ -656,10 +683,10 @@ const CreateArticle = () => {
               }
             }}
             onClick={() => setShowTagSuggestions(true)}
-            className="w-full border border-gray-300 p-2 "
+            className={`w-full focus:outline-none border p-2 ${isDarkMode ? 'border-gray-600':'border-gray-300'} `}
           />
           {showTagSuggestions &&
-          <div className='flex flex-col w-full bg-white max-h-[200px] overflow-y-scroll'>         
+          <div className={`flex flex-col w-full ${isDarkMode ? '':'bg-white'}  max-h-[200px] overflow-y-scroll`}>         
               {TagsSuggestionsFiltered.map((suggestion, index) => (
                 <button
                   key={index}
@@ -669,7 +696,7 @@ const CreateArticle = () => {
                       tags: [...prev.tags, suggestion.query],
                     }))
                   }
-                  className="text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 cursor-pointer px-2 min-w-full text-start py-1"
+                  className={`text-sm  ${isDarkMode ?' text-gray-400':'text-gray-600'} hover:text-gray-800 hover:bg-gray-100 cursor-pointer px-2 min-w-full text-start py-1`}
                 >
                   {suggestion.query}
                 </button>
@@ -679,7 +706,7 @@ const CreateArticle = () => {
           </div>  
 
           {/* Location */}
-          <div className="border border-gray-300  bg-white p-4">
+          <div className={`border ${isDarkMode ? 'bg-[#333] border-gray-600' : 'bg-white border-gray-300'} p-4`}>
             <h3 className="font-semibold mb-2">Location</h3>
             <input
               type="text"
@@ -687,11 +714,53 @@ const CreateArticle = () => {
               placeholder="Location"
               value={formData.location || ''}
               onChange={handleChange}
-              className="w-full text-lg border bg-white border-gray-300 px-2 py-1 focus:outline-none"
+              className={`w-full text-lg border  ${isDarkMode ? 'bg-[#333] border-gray-600':'bg-white border-gray-300'} px-2 py-1 focus:outline-none`}
             />
           </div>   
         </div>
       </div>
+      {showCropper && (
+        <div className="fixed inset-0 z-50 bg-[#00000079] bg-opacity-70 flex justify-center items-center">
+          <div className="bg-white p-4 w-[90%] max-w-2xl">
+            <div className="relative w-full h-96 bg-gray-200">
+              <Cropper
+                image={uploadedImage}
+                crop={crop}
+                zoom={zoom}
+                aspect={16 / 9}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={(croppedArea, pixels) => {
+                  setCroppedAreaPixels(pixels);
+                }}
+              />
+            </div>
+            <div className="flex justify-between mt-4">
+              <button
+                className="bg-gray-300 px-4 py-2 "
+                onClick={() => setShowCropper(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-black text-white px-4 py-2 "
+                onClick={async () => {
+                  const blob = await getCroppedImg(uploadedImage, croppedAreaPixels);
+                  const file = new File([blob], 'cropped.jpg', { type: 'image/jpeg' });
+                  setFormData((prev) => ({ ...prev, thumbnail: file }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    thumbnailPreview: URL.createObjectURL(blob),
+                  }));
+                  setShowCropper(false);
+                }}
+              >
+                Crop & Set Thumbnail
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

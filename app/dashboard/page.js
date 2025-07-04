@@ -1,7 +1,5 @@
 'use client'
-import React, { useState } from "react";
-
-import DashboardSection  from "@/components/dashboard/DashboardSection";
+import React, { useEffect, useState } from "react";
 
 import Image1 from '@/public/images/Thumbnail/hq720(1).jpg'
 import Image2 from '@/public/images/Thumbnail/hq720(2).jpg'
@@ -9,8 +7,18 @@ import Image3 from '@/public/images/Thumbnail/hq720(3).jpg'
 import Image4 from '@/public/images/Thumbnail/hq720(4).jpg'
 import Image5 from '@/public/images/Thumbnail/hq720.jpg'
 import Image6 from '@/public/images/Thumbnail/hq720(5).jpg'
+import DashboardScreen from "@/components/dashboard/DashboardScreen";
+import DashboardScreenSkeleton from "@/components/dashboard/DashboardScreenSkeleton";
 
 const Page = () => {
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }, []);
   
   const sampleMessages = [
     {
@@ -88,7 +96,8 @@ const Page = () => {
   };
   return (
     <div className="w-full">
-      <DashboardSection data={fakeUserData} />
+      {loading ? <DashboardScreenSkeleton /> : <DashboardScreen />}
+      
       </div>
   )
 }

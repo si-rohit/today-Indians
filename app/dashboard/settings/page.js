@@ -7,6 +7,8 @@ import { Mail,CircleCheck ,ChevronRight ,UserRoundPlus   } from 'lucide-react';
 import { useSelector } from "react-redux";
 import userIcon from '@/public/images/userIcon.png'
 import ChangePassword from "@/components/dashboard/setting/ChangePassword";
+import { el } from "date-fns/locale";
+import OtpInput from 'react-otp-input';
 
 const settingsTabs = [
   "General",
@@ -20,19 +22,66 @@ const Page = () => {
   const [activeTab, setActiveTab] = useState("Privacy & Security");
   const [enabled, setEnabled] = useState(false);
   const [enablePrivateProfile, setEnablePrivateProfile] = useState(false);
-  const [enable2FA, setEnable2FA] = useState(true);
+  const [enable2FA, setEnable2FA] = useState(false);
   const [enableHideEmail, setEnableHideEmail] = useState(true);
   const [enableHidePhone, setEnableHidePhone] = useState(true);
   const [enableComments, setEnableComments] = useState(true);
   const [ShowChangePassword, setShowChangePassword] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [openOtpInput, setOpenOtpInput] = useState(false);
   const router = useRouter()
 
   const { user } = useSelector(store => store.auth);
   // console.log(user);
+  if(user? user['2sv'] === "1" :'' ) setEnable2FA(true);
 
   const handleCloseChangePassword = () => {
     setShowChangePassword(false);
   };
+
+  const handleOtpSend = async()=>{
+    const formData = new FormData();
+    formData.append('data',user.email);
+    formData.append('resend',1);
+    const resp = await fetch(`https://5341.general.pointer.8080-server.net/verify_otp?uid=${user.user_id}&channel=42`, {method: 'POST',
+      headers: {
+        'Authorization': '1',
+      },
+      body: formData
+    })
+    const data = await resp.json();
+    console.log(data);
+    if(data.response === "error") return;
+    else{
+      setOpenOtpInput(true);
+    }
+  }
+
+  const handleOtpVerification = async()=>{
+    const formData = new FormData();
+    formData.append('utp', otp);
+    formData.append('data',user.email);
+    if(!user['2sv'] === "1"){
+      formData.append('v_disable',true)
+    }
+    else{
+      formData.append('v_enable',true)
+    }
+    console.log(otp,user.email,user.user_id)
+    const resp = await fetch(`https://5341.general.pointer.8080-server.net/verify_otp?uid=${user.user_id}&channel=42`,
+    {method: 'POST',
+    headers: {
+      'Authorization': '1',
+    },
+    body: formData
+    })
+    const data = await resp.json();
+    console.log(data);
+    if(data.response === "error") return;  
+    else{
+      setOpenOtpInput(false);
+    }
+  }
 
   const renderContent = () => {
     switch (activeTab) {
@@ -136,7 +185,7 @@ const Page = () => {
                     <h1 className=" text-[16px]">Two-Factor Authentication</h1>
                   </div>
                   <button
-                    onClick={() => setEnable2FA(!enable2FA)}
+                    onClick={() => handleOtpSend()}
                     className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors duration-300 ${
                       enable2FA ? 'bg-blue-500' : 'bg-gray-300'
                     }`}
@@ -148,6 +197,26 @@ const Page = () => {
                     />
                   </button>
                 </div>
+                {openOtpInput && 
+                <div className="flex items-center justify-between mt-2">
+                  <OtpInput value={otp}
+                    onChange={setOtp}
+                    numInputs={4}
+                    inputStyle={{
+                      width: "3rem",
+                      height: "3rem",
+                      margin: "0 0.25rem",
+                      fontSize: "1.5rem",
+                      border: "1px solid #d1d5db",
+                      backgroundColor: "#d1d5db",
+                    }}
+                    shouldAutoFocus
+                    isInputNum
+                    renderInput={(props) => <input {...props} />}
+                  />
+                  <button onClick={()=>handleOtpVerification()} className="text-white bg-black px-6 py-2">Verify</button>
+                </div>
+                }
                 <p className="text-gray-600 pr-5 mt-1 text-[12px]">
                   Two-factor authentication adds an extra layer of security to your account by requiring you to enter a verification code sent to your phone or email in addition to your password when you sign in.
                 </p>

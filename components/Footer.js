@@ -1,100 +1,142 @@
-'use client'
+import { FaInstagram, FaFacebookF, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import Link from "next/link";
-import { FaFacebookF,FaTwitter ,FaPinterest,FaInstagram,FaYoutube,FaRegCalendarAlt,FaSearch,FaCaretRight    } from "react-icons/fa";
+import logo from "@/public/images/The-Today-Indians-Logo-Pack/Main-White@4x.png";
+import Image from "next/image";
 
 const Footer = () => {
-    return (
-      <footer className="sticky bottom-0 bg-gray-100 text-gray-800">
-        <div className="container mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* About Us */}
+  return (
+    <footer className="bg-black text-white text-sm px-4 md:px-12 py-8">
+      <div className="max-w-7xl mx-auto border-b border-gray-700 pb-8 flex flex-col lg:flex-row gap-10">
+        {/* Left Logo and Description */}
+        <div className="lg:w-1/4">
+          <Link href="/">
+            <Image src={logo} alt="Logo" className="h-10 w-auto" />
+          </Link>
+          <p className="text-gray-400 mb-4">
+            The Today Indians is a trusted digital news platform bringing you the latest stories from India and around the world.
+          </p>
+          <p className="text-gray-500 text-xs mb-4">© 2025 The Today Indians All Rights Reserved</p>
           <div>
-            <h2 className="font-semibold text-lg">About Us</h2>
-            <div className="border-t w-10 my-2 border-gray-400"></div>
-            <p className="font-bold">Address</p>
-            <p>71-75 Shelton St</p>
-            <p>London, United Kingdom</p>
-            <p>WC2H 9JQ</p>
-            <p className="font-bold mt-4">Hours</p>
-            <p>Monday—Friday: 9:00AM–5:00PM</p>
-            <p>Saturday & Sunday: 11:00AM–3:00PM</p>
+            <p className="font-semibold mb-2">Follow us :</p>
+            <div className="flex gap-3 text-xl">
+              <FaInstagram />
+              <FaFacebookF />
+              <FaXTwitter />
+              <FaYoutube />
+            </div>
           </div>
-  
-          {/* From Blog */}
+        </div>
+
+        {/* Footer Links */}
+        <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 text-sm">
+          {/* National */}
           <div>
-            <h2 className="font-semibold text-lg">From Blog</h2>
-            <div className="border-t w-10 my-2 border-gray-400"></div>
-            <ul className="space-y-2">
-              <li className="flex ">
-                <FaCaretRight className="mt-1 mr-1"/>
-                <Link href="#" className="hover:underline">
-                  Those who have created peace, are the world better?
-                </Link>
-              </li>
-              <li className="flex items-center">
-                <FaCaretRight className="mt-1 mr-1"/>
-                <Link href="#" className="hover:underline">
-                  This Concept Jet Could Get You From New York To London In Under 11 Minutes
-                </Link>
-              </li>
-              <li className="flex items-center">
-                <FaCaretRight className="mt-1 mr-1"/>
-                <Link href="#" className="hover:underline">
-                  The Shy Person’s Guide to Winning Friends and Influencing People
-                </Link>
-              </li>
+            <h4 className="font-semibold mb-2">National</h4>
+            <ul className="space-y-1 text-gray-300">
+              <li><Link href="#">Politics</Link></li>
+              <li><Link href="#">Government Policies</Link></li>
+              <li><Link href="#">Crime</Link></li>
+              <li><Link href="#">Education</Link></li>
+              <li><Link href="#">Weather Updates</Link></li>
             </ul>
           </div>
-  
-          {/* Latest Tweets */}
+
+          {/* Entertainment */}
           <div>
-            <h2 className="font-semibold text-lg">Latest Tweets</h2>
-            <div className="border-t w-10 my-2 border-gray-400"></div>
-            <p>Twitter said: &quot;Could not authenticate you.&quot;</p>
+            <h4 className="font-semibold mb-2">Entertainment</h4>
+            <ul className="space-y-1 text-gray-300">
+              <li><Link href="#">Bollywood</Link></li>
+              <li><Link href="#">Hollywood</Link></li>
+              <li><Link href="#">TV Series</Link></li>
+              <li><Link href="#">OTT</Link></li>
+              <li><Link href="#">Music</Link></li>
+            </ul>
           </div>
-  
-          {/* Popular Tags */}
+
+          {/* World */}
           <div>
-            <h2 className="font-semibold text-lg">Popular Tags</h2>
-            <div className="border-t w-10 my-2 border-gray-400"></div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {["beautiful", "couple", "Destructively", "droll", "fashion", "in love", "intimate", "life", "lifestyle", "loving", "men", "travel"].map(
-                (tag) => (
-                  <span key={tag} className="px-3 py-1 bg-gray-200 rounded-md text-sm">
-                    {tag}
-                  </span>
-                )
-              )}
-            </div>
+            <h4 className="font-semibold mb-2">World</h4>
+            <ul className="space-y-1 text-gray-300">
+              <li><Link href="#">Asia</Link></li>
+              <li><Link href="#">Americas</Link></li>
+              <li><Link href="#">Europe</Link></li>
+              <li><Link href="#">Middle East</Link></li>
+              <li><Link href="#">Africa</Link></li>
+            </ul>
+          </div>
+
+          {/* Health */}
+          <div>
+            <h4 className="font-semibold mb-2">Health</h4>
+            <ul className="space-y-1 text-gray-300">
+              <li><Link href="#">Fitness</Link></li>
+              <li><Link href="#">Mental Health</Link></li>
+              <li><Link href="#">Medicine</Link></li>
+              <li><Link href="#">Lifestyle Tips</Link></li>
+            </ul>
+          </div>
+
+          {/* Opinion */}
+          <div>
+            <h4 className="font-semibold mb-2">Opinion</h4>
+            <ul className="space-y-1 text-gray-300">
+              <li><Link href="#">Editorial</Link></li>
+              <li><Link href="#">Columns</Link></li>
+              <li><Link href="#">Expert Voices</Link></li>
+              <li><Link href="#">Finance</Link></li>
+              <li><Link href="#">Real Estate</Link></li>
+            </ul>
+          </div>
+
+          {/* Business */}
+          <div>
+            <h4 className="font-semibold mb-2">Business</h4>
+            <ul className="space-y-1 text-gray-300">
+              <li><Link href="#">Stock Market</Link></li>
+              <li><Link href="#">Startups</Link></li>
+              <li><Link href="#">Economy</Link></li>
+              <li><Link href="#">Finance</Link></li>
+              <li><Link href="#">Real Estate</Link></li>
+            </ul>
+          </div>
+
+          {/* Sports */}
+          <div>
+            <h4 className="font-semibold mb-2">Sports</h4>
+            <ul className="space-y-1 text-gray-300">
+              <li><Link href="#">Football</Link></li>
+              <li><Link href="#">Rugby</Link></li>
+              <li><Link href="#">Tennis</Link></li>
+              <li><Link href="#">Cricket</Link></li>
+              <li><Link href="#">Olympics</Link></li>
+            </ul>
+          </div>
+
+          {/* Technology */}
+          <div>
+            <h4 className="font-semibold mb-2">Technology</h4>
+            <ul className="space-y-1 text-gray-300">
+              <li><Link href="#">AI</Link></li>
+              <li><Link href="#">Gadgets</Link></li>
+              <li><Link href="#">Internet</Link></li>
+              <li><Link href="#">Cyber Security</Link></li>
+              <li><Link href="#">Robotics</Link></li>
+            </ul>
           </div>
         </div>
-  
-        {/* Bottom Footer */}
-        <div className="bg-black text-white py-4 text-center">
-          <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-6">
-            <p className="text-[12px] text-gray-400">Copyright © Svayam Incarnation Limited.</p>
-            <h1 className="font-black text-xl">EmBe</h1>
-            <div className="flex space-x-4">
-              <Link href="#" className="text-gray-400 hover:text-white">
-              <FaFacebookF />
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-white">
-              <FaTwitter />
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-white">
-              <FaPinterest />
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-white">
-              <FaInstagram />
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-white">
-              <FaYoutube />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
-    );
-  };
-  
-  export default Footer;
-  
+      </div>
+
+      {/* Bottom Links */}
+      <div className="mt-6 flex flex-col md:flex-row justify-center md:justify-between items-center text-gray-500 text-xs gap-2 flex-wrap">
+        <Link href="#">Privacy Policy</Link>
+        <Link href="#">Terms of Use</Link>
+        <Link href="#">Sales and Refunds</Link>
+        <Link href="#">Cookies</Link>
+        <Link href="#">Legal</Link>
+        <Link href="#">Advertise with us</Link>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;

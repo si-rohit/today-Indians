@@ -14,11 +14,27 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import MobileRespHeader from '@/components/MobileComponents/MobileRespHeader'
 import MobileRespFooter from '@/components/MobileComponents/MobileRespFooter'
+import { HiOutlineEye } from 'react-icons/hi'
+import cleanDistanceLocale from '@/utils/cleanDistanceLocale'
+import { formatDistanceToNow } from 'date-fns'
 
 const Page = () => {
   const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+    useEffect(() => {
+        const Theam = localStorage.getItem('theam');
+        if (Theam === 'dark') {
+            setIsDarkMode(true);
+        }
+        else {
+            setIsDarkMode(false);
+        }
+    }, []);
 
   const AllArticles = async()=>{
+    setLoading(true);
     const res = await fetch(`https://5341.general.pointer.8080-server.net/posts?sort=x_date&channel=42`,{
       method: 'GET',
       headers: {
@@ -27,95 +43,74 @@ const Page = () => {
       },
     })
     const data = await res.json();
-    console.log(data);
+    // console.log(data);
     setArticles(data.data);
+    setLoading(false);
   }
   useEffect(()=>{
     AllArticles();
   },[])
 
-  // const articles = [
-  //       {
-  //         title: "Those who have created peace, are the world better?",
-  //         date: "January 6, 2020",
-  //         read: "3 mins read",
-  //         author: "Ryan",
-  //         description:
-  //           "Ash jaguar ostrich quail one excited dear hello and bound[1] and the and bland moral misheard roadrunner flapped lynx...",
-  //         image: Image1,
-  //       },
-  //       {
-  //         title: "This Concept Jet Could Get You From New York To London In Under 11 Minutes",
-  //         date: "July 26, 2019",
-  //         read: "3 mins read",
-  //         author: "Ryan",
-  //         description:
-  //           "Ash jaguar ostrich quail one excited dear hello and bound[1] and the and bland moral misheard roadrunner flapped lynx...",
-  //         image: Image2,
-  //       },
-  //       {
-  //         title: "Bradley Cooper’s “Twin” Causes Madness At Sundance Film Festival Opening",
-  //         date: "July 26, 2019",
-  //         read: "2 mins read",
-  //         author: "Ryan",
-  //         description:
-  //           "Uninhibited carnally hired played in whimpered dear gorilla koala depending and much yikes off far quetzal goodness...",
-  //         image: Image3,
-  //       },
-  //       {
-  //         title: "Greek Islanders are to be Nominated for Peace Prize",
-  //         date: "July 25, 2019",
-  //         read: "2 mins read",
-  //         author: "Ryan",
-  //         description:
-  //           "Submissive much less between in and the by wow cutely versus vitally much by alas when on far that koala fought...",
-  //         image: Image4,
-  //       },
-  //       {
-  //         title: "30th Anniversary of the Space Shuttle Challenger Catastrophe, in pictures",
-  //         date: "July 25, 2019",
-  //         read: "2 mins read",
-  //         author: "Ryan",
-  //         description:
-  //           "More accommodatingly anticipatively because until frog attractively and ludicrously that the re-laid sociable...",
-  //         image: Image5,
-  //       },
-  //       {
-  //         title: "Uber is Using Phone Gyrometers to Check Whether Drivers go Over Speed",
-  //         date: "July 24, 2019",
-  //         read: "2 mins read",
-  //         author: "Ryan",
-  //         description:
-  //           "Some snug a some far a much sociably hence and where justly considering one preparatory up this less and crud had wow...",
-  //         image: Image6,
-  //       },
-  //     ]
+  console.log(articles);
   return (
-    <div>
+    <div className={isDarkMode ? 'bg-[#12110f] text-white' : ''}>
       {/* <SubHeader/> */}
       <div className='block max-[426px]:hidden'>
-        <Header/>
+        {/* <Header/> */}
+        <SubHeader/>
+      </div>
+      <div className=" bg-[#f8b841] text-black overflow-hidden flex items-center mt-25">
+        <div className='bg-red-500 text-white px-2 font-bold'>
+          Breaking
+        </div>
+        <marquee className="bg-[#f8b841] text-black h-full flex items-center justify-start " onMouseEnter={(e)=>e.target.setAttribute("scrollamount",0)} onMouseLeave={(e)=>e.target.setAttribute("scrollamount",6)}>
+          {[...Array(30).keys()].map((i) => (
+            <span key={i} className="px-5 hover:underline cursor-pointer ">
+              This website is currently in beta phase. Some features may not work as expected.
+            </span>
+          ))}
+        </marquee>
       </div>
       <div className='hidden max-[426px]:block'>
         <MobileRespHeader/>
       </div>
       
-      <div className="p-4">
-            <div className="container mx-auto grid md:grid-cols-3 gap-6">
-              {articles.map((article, index) => (
-                <Link href={`/article/${article.post_id}`} key={index} className=" overflow-hidden">
-                    <Image src={article.image?.trimStart()  || noImage} alt="News" width={300} height={300} className="w-full object-cover" />
-                    <div className="pt-2">
-                      <h3 className="text-lg font-semibold leading-5">{article.title.split(' ').slice(0, 8).join(' ')}</h3>
-                      <p className=' text-sm text-gray-500'>{article.sub_descr}</p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(article.date_added).toDateString()} • {article.user.username}
-                      </p>
-                    </div>
+       <div className="p-4">
+        <div className="container mx-auto grid md:grid-cols-4 gap-6">
+          {loading
+            ? Array(6).fill(0).map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="w-full h-48 bg-gray-300" />
+                  <div className="pt-2 space-y-2">
+                    <div className="h-4 w-3/4 bg-gray-300" />
+                    <div className="h-3 w-full bg-gray-300" />
+                    <div className="h-3 w-1/2 bg-gray-300" />
+                  </div>
+                </div>
+              ))
+            : articles.map((article, index) => (
+              <div key={index} className='overflow-hidden cursor-pointer'>
+                <Link href={`/article/${article.permalink}`} className="">
+                  <Image
+                    src={article.image?.trimStart() || noImage}
+                    alt="News"
+                    width={300}
+                    height={300}
+                    className="w-full h-40"
+                  />
                 </Link>
+                  <div className="pt-2">
+                    <Link href={`/article/${article.permalink}`} className="text-lg font-semibold leading-5">{article.title.slice(0, 50)}...</Link>
+                    <div className={`text-sm flex items-center gap-1 ${isDarkMode ? 'text-gray-400':'text-gray-500'}`}>
+                      <Link href={`/${article.user.username !== '' ? `${article.user.username}` : `${article.user.user_id}`}`}>{`${article.user.firstname} ${article.user.lastname}` || article.user.username || `user- ${article.user.user_id}`}</Link>
+                     • {formatDistanceToNow(article.date_added, {addSuffix: true, locale: cleanDistanceLocale})} {article.views ? "•" : ''} {article.views ? <HiOutlineEye /> : ''} {article.views ? `${article.views} ` : ''} 
+                    </div>
+                    <Link href={`/article/${article.permalink}`} className={`text-sm ${isDarkMode ? 'text-gray-400':'text-gray-500'}`}>{article.meta_description.length > 80 ? article.meta_description.slice(0, 80) + '...' : article.meta_description}</Link>                    
+                  </div>
+              </div> 
               ))}
-            </div>
-          </div>
+        </div>
+      </div>
       <div className='sticky mt-18 w-full bottom-0 hidden max-[426px]:block'>
           <MobileRespFooter />   
       </div> 

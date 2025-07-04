@@ -20,10 +20,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import Drive from "./page";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MdUploadFile,MdDriveFileMoveOutline  } from "react-icons/md";
-import FetchDataAPI from "./apicall/FetchDataAPI";
 import { useSelector } from "react-redux";
-import CreateFolderAPI from "./apicall/CreateFolderAPI";
-import { set } from "mongoose";
 
 const Layout = ({ children }) => {
     const [search, setSearch] = useState("");
@@ -70,11 +67,13 @@ const Layout = ({ children }) => {
       }else{
         parentId = userFolders;
       }
+    
+      // console.log(userFolders);
 
     const handleCreateFolder = async() => {
       setShowCreateInput(false);
-      setLoading(true);
-      
+      setLoading(true);     
+
        try {
         const response = await fetch('/api/create-folder', {
             method: 'POST',

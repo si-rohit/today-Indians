@@ -1,5 +1,5 @@
 'use client'
-import logo from "@/public/images/logo.png"
+import logo from "@/public/images/The-Today-Indians-Logo-Pack/Main-Black@4x.png";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -20,7 +20,7 @@ const Header = () => {
         {/* Navigation Bar */}
         <nav className="border-y border-gray-200 py-2 w-full">
           <div className="relative container mx-auto flex max-[426px]:flex-col justify-center items-center px-4 gap-2">
-              <div className="absolute max-[426px]:relative right-0  max-[426px]:w-full flex justify-end">
+              <div className="absolute  max-[426px]:relative right-14 max-[426px]:w-full flex justify-end">
                 <HeaderProfileSection />
               </div>
               <div className="flex items-center">

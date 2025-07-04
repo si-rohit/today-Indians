@@ -2,38 +2,89 @@
 import React, { useEffect, useState }  from 'react'
 import { ArrowUpFromLine } from 'lucide-react';
 import userIcon from '@/public/images/userIcon.png'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { setUser } from '@/app/redux/authSlice';
 
 const Page = () => {
   const { user } = useSelector(store => store.auth);
+  const [userDetails, setUserDetails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userGroups, setUserGroups] = useState([]);
   const [showuserGroups, setShowuserGroups] = useState(false);
+
+  const dispatch = useDispatch();
   // console.log(user);
   const router = useRouter();
   if (!user) {
     router.push("/auth");
   }
 
-  const fetchUserGroups = async () => {
-    const response = await fetch('https://5341.general.pointer.8080-server.net/user_group?channel=32&type=user');
-    const data = await response.json();
-    setUserGroups(data);
-  };
+  // const fetchUserDetails = async () => {
+  //   try {
+  //     const response = await fetch(`https://5341.general.pointer.8080-server.net/user?id=${user.user_id}`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': 'Bearer 1',
+  //       },
+  //     });
+  //     const userData = await response.json();
+  //     dispatch(setUser(userData[0]));
+  //   } catch (error) {
+  //     console.error('Error fetching user details:', error);
+  //   }
+  // };
+
+  // const fetchUserGroups = async () => {
+  //   const response = await fetch('https://5341.general.pointer.8080-server.net/user_group?channel=32&type=user');
+  //   const data = await response.json();
+  //   setUserGroups(data);
+  // };
+
+
+  // useEffect(() => {
+  //   fetchUserGroups();    
+  //   fetchUserDetails();
+  // }, [fetchUserDetails, fetchUserGroups]);
 
   useEffect(() => {
-    fetchUserGroups();
-  }, []);
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch(`https://5341.general.pointer.8080-server.net/user?id=${user.user_id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer 1',
+          },
+        });
+        const userData = await response.json();
+        dispatch(setUser(userData[0]));
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
 
-  // console.log(userGroups);
+    const fetchUserGroups = async () => {
+      const response = await fetch('https://5341.general.pointer.8080-server.net/user_group?channel=32&type=user');
+      const data = await response.json();
+      setUserGroups(data);
+    };
+
+    fetchUserDetails();
+    fetchUserGroups();
+  }, [user.user_id, dispatch]);
+
+  
+
+  // console.log(userDetails);
 
   const [profile, setProfile] = useState({
     image: user.pass_photo || '',
     username: user.username || '',
     bio: user.bio || '',
-    group: '',
+    group: user.user_group || '',
     dob: user.dob || '',
     firstname:user.firstname +' '+ user.lastname || '',
     gender:user.gender || '',
@@ -55,6 +106,7 @@ const Page = () => {
   const handleSubmitImage = async()=>{
     const formData = new FormData();
     formData.append('pass_photo', profile.image);
+    console.log(profile.image);
     // formData.append('uid', user.user_id);
     const response = await fetch(`https://5341.general.pointer.8080-server.net/update?uid=${user.user_id}&update_profile=1`, {
       method: 'POST',
@@ -67,7 +119,6 @@ const Page = () => {
     const data = await response.json();
     console.log(data);
   }
-
 
   const handleSave = async() => {
     setLoading(true);
@@ -92,6 +143,7 @@ const Page = () => {
     const data = await response.json();
     console.log(data);
     setLoading(false);
+    fetchUserDetails();
   };
   const filteredUserGroups = userGroups.filter((group) => group.name.toLowerCase().includes(profile.group?.toLowerCase()));
   // console.log(filteredUserGroups);
@@ -191,7 +243,7 @@ const Page = () => {
             <textarea
               name="bio"
               rows="3"
-              value={profile.bio}
+              value={profile.bio || ''}
               onChange={handleChange}
               className="w-full border border-gray-300 p-2"
             ></textarea>
