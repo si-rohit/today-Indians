@@ -40,7 +40,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logo from "@/public/images/The-Today-Indians-Logo-Pack/Editor-Black@4x.png"
-import logo2 from "@/public/images/The-Today-Indians-Logo-Pack/Editor-White@4x.png"
+import logo2 from "@/public/images/The-Today-Indians-Logo-Pack/Editor-Black@4x.png"
 import { VscListFlat } from "react-icons/vsc";
 import { FaSearch } from 'react-icons/fa';
 import { FaRegMoon,FaSun } from "react-icons/fa";
